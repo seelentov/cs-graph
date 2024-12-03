@@ -18,7 +18,7 @@ public class Graph
 
         foreach (var node in _nodes)
         {
-            res += $"{node.Key}: ({string.Join(", ", node.Value.Edges.Select(el => el.Adj))})\n";
+            res += $"{node.Key}: {node.Value}\n";
         }
 
         return res;
@@ -39,26 +39,12 @@ public class Graph
 
         Node newNode = new Node();
 
+        _nodes[key] = newNode;
+
         if (sublingKey != null)
         {
-            Node subling = Get((int)sublingKey);
-
-            if (direction == Direction.To)
-            {
-                subling.Edges.Add(new Edge(key, weight));
-            }
-            else if (direction == Direction.From)
-            {
-                newNode.Edges.Add(new Edge((int)sublingKey, weight));
-            }
-            else
-            {
-                subling.Edges.Add(new Edge(key, weight));
-                newNode.Edges.Add(new Edge((int)sublingKey, weight));
-            }
+            Join((int)sublingKey, key, weight, direction);
         }
-
-        _nodes[key] = newNode;
     }
 
     public void Remove(int key)
@@ -75,7 +61,7 @@ public class Graph
         _nodes.Remove(key);
     }
 
-    public void Join(int from, int to, Direction direction = Direction.To, int weight = 1)
+    public void Join(int from, int to, int weight = 1, Direction direction = Direction.To)
     {
         Node fromNode = Get(from);
         Node toNode = Get(to);
@@ -100,6 +86,7 @@ public class Graph
         Queue<int> queue = [];
         HashSet<int> visited = [];
         queue.Enqueue(start);
+        visited.Add(start);
 
         while (queue.Count > 0)
         {
@@ -122,6 +109,7 @@ public class Graph
         Stack<int> stack = [];
         HashSet<int> visited = [];
         stack.Push(start);
+        visited.Add(start);
 
         while (stack.Count > 0)
         {

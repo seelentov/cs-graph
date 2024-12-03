@@ -12,3 +12,4 @@
 /home/vlad/Документы/GitHub/cs-graph/ConsoleApp1/obj/Debug/net8.0/ConsoleApp1.pdb
 /home/vlad/Документы/GitHub/cs-graph/ConsoleApp1/obj/Debug/net8.0/ConsoleApp1.genruntimeconfig.cache
 /home/vlad/Документы/GitHub/cs-graph/ConsoleApp1/obj/Debug/net8.0/ref/ConsoleApp1.dll
+/home/vlad/Документы/GitHub/cs-graph/ConsoleApp1/obj/Debug/net8.0/ConsoleApp1.sourcelink.json
