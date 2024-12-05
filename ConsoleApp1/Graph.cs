@@ -126,4 +126,37 @@ public class Graph
             }
         }
     }
+
+    public List<List<int>> FindAllPaths(int start, int end)
+    {
+        List<int> path = [];
+        HashSet<int> visited = [];
+        List<List<int>> paths = [];
+
+        FindAllPathsRecursive(start, end, path, visited, paths);
+
+        return paths;
+    }
+
+    public void FindAllPathsRecursive(int current, int end, List<int> path, HashSet<int> visited, List<List<int>> paths)
+    {
+        path.Add(current);
+        visited.Add(current);
+
+        if (current == end)
+        {
+            paths.Add([.. path]);
+        }
+
+        foreach (var edge in _nodes[current].Edges)
+        {
+            if (!visited.Contains(edge.Adj))
+            {
+                FindAllPathsRecursive(edge.Adj, end, path, visited, paths);
+            }
+        }
+
+        path.RemoveAt(path.Count - 1);
+        visited.Remove(current);
+    }
 }
