@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 
 namespace ConsoleApp1;
 
@@ -30,7 +31,7 @@ public class Graph
         return node;
     }
 
-    public void Add(int key, int? sublingKey = null, int weight = 1, Direction direction = Direction.To)
+    public void Add(int key, int? sublingKey = null, int weight = 1, Direction direction = Direction.FromTo)
     {
         if (sublingKey != null && !_nodes.ContainsKey((int)sublingKey))
         {
@@ -61,7 +62,7 @@ public class Graph
         _nodes.Remove(key);
     }
 
-    public void Join(int from, int to, int weight = 1, Direction direction = Direction.To)
+    public void Join(int from, int to, int weight = 1, Direction direction = Direction.FromTo)
     {
         Node fromNode = Get(from);
         Node toNode = Get(to);
@@ -83,6 +84,11 @@ public class Graph
 
     public void BFS(int start, Action<Node, int> action)
     {
+        if (!_nodes.ContainsKey(start))
+        {
+            return;
+        }
+
         Queue<int> queue = [];
         HashSet<int> visited = [];
         queue.Enqueue(start);
@@ -106,6 +112,11 @@ public class Graph
 
     public void DFS(int start, Action<Node, int> action)
     {
+        if (!_nodes.ContainsKey(start))
+        {
+            return;
+        }
+
         Stack<int> stack = [];
         HashSet<int> visited = [];
         stack.Push(start);
@@ -127,8 +138,13 @@ public class Graph
         }
     }
 
-    public List<List<int>> FindAllPaths(int start, int end)
+    public List<List<int>>? FindAllPaths(int start, int end)
     {
+        if (!_nodes.ContainsKey(start))
+        {
+            return null;
+        }
+
         List<int> path = [];
         HashSet<int> visited = [];
         List<List<int>> paths = [];
@@ -159,4 +175,186 @@ public class Graph
         path.RemoveAt(path.Count - 1);
         visited.Remove(current);
     }
+
+    public List<int>? FindPathDFS(int start, int end)
+    {
+        if (!_nodes.ContainsKey(start))
+        {
+            return null;
+        }
+
+        List<int> path = [];
+        HashSet<int> visited = [];
+
+        if (FindPathDFSRecursive(start, end, path, visited))
+        {
+            return path;
+        }
+        else
+        {
+            return [];
+        }
+
+    }
+
+    public bool FindPathDFSRecursive(int current, int end, List<int> path, HashSet<int> visited)
+    {
+        path.Add(current);
+        visited.Add(current);
+
+        if (current == end)
+        {
+            return true;
+        }
+
+        foreach (var edge in _nodes[current].Edges)
+        {
+            if (!visited.Contains(edge.Adj))
+            {
+                if (FindPathDFSRecursive(edge.Adj, end, path, visited))
+                {
+                    return true;
+                }
+            }
+        }
+
+        path.RemoveAt(path.Count - 1);
+        return false;
+    }
+
+    public List<int>? FindPathBFS(int start, int end)
+    {
+        if (!_nodes.ContainsKey(start))
+        {
+            return null;
+        }
+
+        HashSet<int> visited = [];
+        Queue<int> queue = [];
+
+        Dictionary<int, int> map = [];
+
+        queue.Enqueue(start);
+        map.Add(start, 0);
+        visited.Add(start);
+
+        while (queue.Count > 0)
+        {
+            int current = queue.Dequeue();
+
+            if (current == end)
+            {
+                List<int> path = [];
+
+                while (current != start)
+                {
+                    path.Insert(0, current);
+                    current = map[current];
+                }
+
+                path.Insert(0, start);
+
+                return path;
+            }
+
+            foreach (Edge edge in _nodes[current].Edges)
+            {
+                if (!visited.Contains(edge.Adj))
+                {
+                    queue.Enqueue(edge.Adj);
+                    map.Add(edge.Adj, current);
+                    visited.Add(edge.Adj);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public List<int>? FindPathDijkstra(int start, int end)
+    {
+        if (!_nodes.ContainsKey(start) || !_nodes.ContainsKey(end))
+        {
+            return null;
+        }
+
+        HashSet<int> unprocessed = [];
+        Dictionary<int, int> weightToNode = [];
+
+        foreach (int node in _nodes.Keys)
+        {
+            unprocessed.Add(node);
+            weightToNode[node] = int.MaxValue; ;
+        }
+
+        weightToNode[start] = 0;
+
+        while (unprocessed.Count > 0)
+        {
+            int? current = null;
+            int minTime = int.MaxValue;
+
+            foreach (int key in unprocessed)
+            {
+                int weight = weightToNode[key];
+
+                if (weight < minTime)
+                {
+                    minTime = weight;
+                    current = key;
+                }
+            }
+
+            if (current == null)
+            {
+                break;
+            }
+
+            foreach (var edge in _nodes[(int)current].Edges)
+            {
+                if (unprocessed.Contains(edge.Adj))
+                {
+                    int weightToCheck = weightToNode[(int)current] + edge.Weight;
+                    if (weightToCheck < weightToNode[edge.Adj])
+                        weightToNode[edge.Adj] = weightToCheck;
+                }
+            }
+
+            unprocessed.Remove((int)current);
+        }
+
+        if (weightToNode[end] != int.MaxValue)
+        {
+            List<int> path = [];
+
+            int current = end;
+
+            while (current != start)
+            {
+                int minWeight = weightToNode[current];
+                path.Insert(0, current);
+
+                foreach (var edge in _nodes[current].Edges)
+                {
+                    if (!weightToNode.ContainsKey(edge.Adj)) continue;
+                    bool prevNodeFound = (edge.Weight + weightToNode[edge.Adj]) == minWeight;
+
+                    if (prevNodeFound)
+                    {
+                        weightToNode.Remove(current);
+                        current = edge.Adj;
+                        break;
+                    }
+                }
+            }
+
+            path.Insert(0, start);
+
+            return path;
+
+        }
+
+        return null;
+    }
+
 }

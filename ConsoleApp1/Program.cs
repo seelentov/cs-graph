@@ -5,35 +5,24 @@ internal class Program
     private static void Main(string[] args)
     {
         Graph graph = new();
+        graph.Add(1);
+        graph.Add(2, 1, 3);
+        graph.Add(3, 1, 7);
+        graph.Add(4, 2, 8);
+        graph.Add(5, 2, 1);
+        graph.Add(6, 5, 5);
+        graph.Join(3, 4, 5);
+        graph.Join(6, 4, 1);
 
-        graph.Add(0);
-        graph.Add(3, 0);
-        graph.Add(6, 3);
-        graph.Add(1, 0);
-        graph.Add(4, 1);
-        graph.Add(7, 4);
-        graph.Add(2, 1);
-        graph.Add(5, 2);
-        graph.Add(8, 5);
+        Console.WriteLine(graph.ToString());
 
-        graph.Join(3, 4);
-        graph.Join(4, 5);
-        graph.Join(6, 7);
-        graph.Join(7, 8);
+        var path = graph.FindPathDijkstra(1, 4);
 
-        Console.WriteLine(graph);
-
-        var paths = graph.FindAllPaths(0, 4);
-
-        Console.WriteLine(paths.Count);
-
-        foreach (List<int> path in paths)
-        {
-            foreach (int step in path)
+        if (path != null)
+            foreach (var item in path)
             {
-                Console.Write(step);
+                Console.WriteLine(item);
             }
-            Console.Write('\n');
-        }
+
     }
 }
