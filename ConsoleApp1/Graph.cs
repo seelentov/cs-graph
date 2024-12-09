@@ -229,14 +229,12 @@ public class Graph
             return null;
         }
 
-        HashSet<int> visited = [];
         Queue<int> queue = [];
 
         Dictionary<int, int> map = [];
 
         queue.Enqueue(start);
         map.Add(start, 0);
-        visited.Add(start);
 
         while (queue.Count > 0)
         {
@@ -259,12 +257,127 @@ public class Graph
 
             foreach (Edge edge in _nodes[current].Edges)
             {
-                if (!visited.Contains(edge.Adj))
+                if (!map.ContainsKey(edge.Adj))
                 {
                     queue.Enqueue(edge.Adj);
                     map.Add(edge.Adj, current);
-                    visited.Add(edge.Adj);
                 }
+            }
+        }
+
+        return null;
+    }
+
+    public List<int>? FindPathBFSTwoSize(int start, int end)
+    {
+        if (!_nodes.ContainsKey(start))
+        {
+            return null;
+        }
+
+        Queue<int> queue = [];
+        Queue<int> queue2 = [];
+
+        Dictionary<int, int> map = [];
+        Dictionary<int, int> map2 = [];
+
+        queue.Enqueue(start);
+        map.Add(start, 0);
+
+        queue2.Enqueue(end);
+        map2.Add(end, 0);
+
+        int? contact = null;
+
+        bool isBreak = false;
+
+        while (queue.Count > 0 || queue2.Count > 0)
+        {
+            if (isBreak)
+            {
+                break;
+            }
+
+            int? current = queue.Count > 0 ? queue.Dequeue() : null;
+
+            if (current != null)
+            {
+                int currentNotNull = (int)current;
+
+                foreach (Edge edge in _nodes[currentNotNull].Edges)
+                {
+                    if (!map.ContainsKey(edge.Adj))
+                    {
+                        map.Add(edge.Adj, currentNotNull);
+
+                        if (map2.ContainsKey(edge.Adj))
+                        {
+                            contact = edge.Adj;
+                            isBreak = true;
+                            break;
+                        }
+
+                        queue.Enqueue(edge.Adj);
+                    }
+                }
+            }
+
+            if (isBreak)
+            {
+                break;
+            }
+
+            int? current2 = queue2.Count > 0 ? queue2.Dequeue() : null;
+
+            if (current2 != null)
+            {
+                int currentNotNull = (int)current2;
+
+                foreach (Edge edge in _nodes[currentNotNull].Edges)
+                {
+                    if (!map2.ContainsKey(edge.Adj))
+                    {
+                        map2.Add(edge.Adj, currentNotNull);
+
+                        if (map.ContainsKey(edge.Adj))
+                        {
+                            contact = edge.Adj;
+                            isBreak = true;
+                            break;
+                        }
+
+                        queue2.Enqueue(edge.Adj);
+                    }
+                }
+            }
+        }
+
+        if (contact != null)
+        {
+            int current = (int)contact;
+
+            while (current != start)
+            {
+                List<int> path = [];
+
+                while (current != start)
+                {
+                    path.Insert(0, current);
+                    current = map[current];
+                }
+
+                current = map2[(int)contact];
+
+                while (current != end)
+                {
+                    path.Add(current);
+                    current = map2[current];
+                }
+
+                path.Insert(0, start);
+                path.Add(end);
+
+                return path;
             }
         }
 
