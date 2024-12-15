@@ -16,13 +16,30 @@ internal class Program
 
         Console.WriteLine(graph.ToString());
 
-        var path = graph.FindPathDijkstra(1, 4);
+        Console.WriteLine("All");
+
+        var path = graph.FindAllPaths(1, 4);
 
         if (path != null)
             foreach (var item in path)
             {
-                Console.WriteLine(item);
+                Console.WriteLine(string.Join("", item));
             }
 
+        Console.WriteLine("");
+        Console.WriteLine("Dijkstra");
+
+        var path2 = graph.FindPathDijkstra(1, 4);
+
+        if (path2 != null)
+            Console.WriteLine(string.Join("", path2));
+
+        Console.WriteLine("");
+        Console.WriteLine("Bellman");
+
+        var path3 = graph.FindPathBellmanFord(1, 4);
+
+        if (path3 != null)
+            Console.WriteLine(string.Join("", path3));
     }
 }

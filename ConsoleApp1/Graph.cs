@@ -470,4 +470,64 @@ public class Graph
         return null;
     }
 
+    public List<int>? FindPathBellmanFord(int start, int end)
+    {
+        if (!_nodes.ContainsKey(start) || !_nodes.ContainsKey(end))
+        {
+            return null;
+        }
+
+        Dictionary<int, int> distances = new Dictionary<int, int>(_nodes.Count);
+        Dictionary<int, int?> previousNodes = new Dictionary<int, int?>(_nodes.Count); // Для реконструкции пути
+
+        foreach (int node in _nodes.Keys)
+        {
+            distances[node] = int.MaxValue;
+            previousNodes[node] = null;
+        }
+        distances[start] = 0;
+
+        for (int i = 1; i < _nodes.Count; i++)
+        {
+            foreach (var node in _nodes)
+            {
+                foreach (var edge in _nodes[node.Key].Edges)
+                {
+                    if (distances[node.Key] + edge.Weight < distances[edge.Adj])
+                    {
+                        distances[edge.Adj] = distances[node.Key] + edge.Weight;
+                        previousNodes[edge.Adj] = node.Key;
+                    }
+                }
+            }
+        }
+
+        foreach (var node in _nodes)
+        {
+            foreach (var edge in _nodes[node.Key].Edges)
+            {
+                if (distances[node.Key] + edge.Weight < distances[edge.Adj])
+                {
+                    return null;
+                }
+            }
+        }
+
+        if (distances[end] == int.MaxValue) return null;
+
+        List<int> path = [];
+        int currentNode = end;
+        while (currentNode != start)
+        {
+            path.Insert(0, currentNode);
+            currentNode = previousNodes[currentNode] ?? throw new Exception("Несогласованный путь найден!");
+        }
+        path.Insert(0, start);
+        return path;
+    }
+
+    public List<int>? FindPathA(int start, int end)
+    {
+
+    }
 }
