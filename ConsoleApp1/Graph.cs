@@ -526,8 +526,4 @@ public class Graph
         return path;
     }
 
-    public List<int>? FindPathA(int start, int end)
-    {
-
-    }
 }
