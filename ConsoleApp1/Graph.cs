@@ -525,5 +525,18 @@ public class Graph
         path.Insert(0, start);
         return path;
     }
+    public List<EdgeUndir> ToEdgeList()
+    {
+        List<EdgeUndir> edges = new();
 
+        foreach (var node in _nodes)
+        {
+            foreach (var edge in _nodes[node.Key].Edges)
+            {
+                edges.Add(new EdgeUndir(edge, node.Key));
+            }
+        }
+
+        return edges;
+    }
 }
